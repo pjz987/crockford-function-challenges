@@ -8,88 +8,132 @@ const identity = (arg) => arg
 
 const identityf = (arg) => () => arg
 
-function addf(x) {
-    return (y) => x + y
-}
+// function addf(x) {
+//     return (y) => x + y
+// }
 
-function liftf(fn) {
-    return function (x) {
-        return function (y) {
-            return fn(x, y)
-        }
-    }
-}
+const addf = (x) => (y) => x + y
 
-function curry(fn, x) {
-    return function (y) {
-        return fn(x, y)
-    }
-}
+// function liftf(fn) {
+//     return function (x) {
+//         return function (y) {
+//             return fn(x, y)
+//         }
+//     }
+// }
 
-function twice(fn) {
-    return (x) => fn(x, x)
-}
+const liftf = (fn) => (x) => (y) => fn(x, y)
 
-function reverse(fn) {
-    return (x, y) => fn(y, x)
-}
+// function curry(fn, x) {
+//     return function (y) {
+//         return fn(x, y)
+//     }
+// }
 
-function composeu(fn1, fn2) {
-    return (x) => fn2(fn1(x))
-}
+const curry = (fn, x) => (y) => fn(x, y)
 
-function composeb(fn1, fn2) {
-    return (x, y, z) => fn2(z, fn1(x, y))
-}
+// function twice(fn) {
+//     return (x) => fn(x, x)
+// }
 
-function limit(fn, int) {
+const twice = (fn) => (x) => fn(x, x)
+
+// function reverse(fn) {
+//     return (x, y) => fn(y, x)
+// }
+
+const reverse = (fn) => (x, y) => fn(y, x)
+
+// function composeu(fn1, fn2) {
+//     return (x) => fn2(fn1(x))
+// }
+
+const composeu = (fn1, fn2) => (x) => fn2(fn1(x))
+
+// function composeb(fn1, fn2) {
+//     return (x, y, z) => fn2(z, fn1(x, y))
+// }
+
+const composeb = (fn1, fn2) => (x, y, z) => fn2(z, fn1(x, y))
+
+// function limit(fn, int) {
+//     let counter = 0
+//     function outFunc(x, y) {
+//         if (int > counter) {
+//             counter++
+//             return fn(x, y)
+//         }
+//     }
+//     return outFunc
+// }
+
+const limit = (fn, int) => {
     let counter = 0
-    function outFunc(x, y) {
+    return (x, y) => {
         if (int > counter) {
             counter++
             return fn(x, y)
         }
     }
-    return outFunc
 }
 
-function from(start) {
-    let counter = -1
-    return function () {
-        counter++
-        return start + counter
+// function from(start) {
+//     let counter = -1
+//     return function () {
+//         counter++
+//         return start + counter
+//     }
+// }
+
+const from = (start) => () => start++
+
+// function to(gen, end) {
+//     return function (x) {
+//         // console.log(gen(x), end)
+//         let value = gen(x)
+//         if (value < end) {
+//             return value
+//         }
+//     }
+// }
+
+const to = (gen, end) => (x) => {
+    const value = gen(x)
+    if (value < end) {
+        return value
     }
 }
 
-function to(gen, end) {
-    return function (x) {
-        // console.log(gen(x), end)
-        let value = gen(x)
-        if (value < end) {
-            return value
-        }
-    }
-}
+// function fromTo(start, end) {
+//     let counter = -1
+//     return function () {
+//         counter++
+//         if (start + counter < end) {
+//             return start + counter
+//         }
+//     }
+// }
 
-function fromTo(start, end) {
-    let counter = -1
-    return function () {
-        counter++
-        if (start + counter < end) {
-            return start + counter
-        }
-    }
-}
+const fromTo = (start, end) => to(from(start), end)
 
-function element(arr, gen) {
+// function element(arr, gen) {
+//     if (gen) {
+//         return () => arr[gen()]
+//     } else {
+//         let counter = -1
+//         return function () {
+//             counter++
+//             return arr[counter]
+//         }
+//     }
+// }
+
+const element = (arr, gen) => {
     if (gen) {
-        return () => arr[gen()]
+        return () => arr[gen()] 
     } else {
-        let counter = -1
-        return function () {
-            counter++
-            return arr[counter]
-        }
+        let counter = 0
+        return () => arr[counter++]
     }
 }
 
@@ -233,7 +277,57 @@ function exp(arr) {
 }
 
 function addg(x) {
-    return (y) => {
-        x + addf(y)
+    function again(next) {
+        if (next === undefined) {
+            return x
+        }
+        x += next
+        return again
     }
+    if (x !== undefined) {
+        return again
+    }
+}
+
+function liftg(fn) {
+    function first(x) {
+        if (x !== undefined) {
+            // console.log(x, 'x')
+
+            function second(y) {
+                // console.log(y, 'y')
+                if (y === undefined) {
+                    return x
+                }
+                // console.log(fn(x, y), 'x * y')
+                x = fn(x,y)
+                return second
+            }
+            return second
+        }
+    }
+    return first
+}
+
+function arrayg(el1) {
+    const array = []
+    function pushIt(el2) {
+        console.log(el1, el2, array)
+        if (el2 === undefined) {
+            return array
+        }
+        array.push(el2)
+        return pushIt
+    }
+    if (el1 === undefined) {
+        return array
+    }
+    return pushIt(el1)
+}
+
+function continuize(fn) {
+    function outFunc(callBack, arg) {
+        
+    }
+    return outFunc
 }
